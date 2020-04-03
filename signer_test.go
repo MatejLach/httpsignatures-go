@@ -25,7 +25,7 @@ func TestSignSha1(t *testing.T) {
 	assert.Equal(t, DefaultSha1Signer.headers, s.Headers)
 
 	assert.Equal(t,
-		"RIdBXxLb6gWsu3bZtq3rQWSR1nk=",
+		"NDQ4NzQxNWYxMmRiZWEwNWFjYmI3NmQ5YjZhZGViNDE2NDkxZDY3OQ==",
 		s.Signature,
 	)
 }
@@ -48,7 +48,7 @@ func TestSignSha256(t *testing.T) {
 	assert.Equal(t, DefaultSha256Signer.headers, s.Headers)
 
 	assert.Equal(t,
-		"mIX1nFtRDhvv8HIUSNpE3NQZZ6EIY98ObNkJM+Oq7AU=",
+		"OTg4NWY1OWM1YjUxMGUxYmVmZjA3MjE0NDhkYTQ0ZGNkNDE5NjdhMTA4NjNkZjBlNmNkOTA5MzNlM2FhZWMwNQ==",
 		s.Signature,
 	)
 }

@@ -6,6 +6,7 @@ import (
 	"crypto/hmac"
 	"crypto/subtle"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -117,7 +118,12 @@ func (s Signature) calculateSignature(key string, r *http.Request) (string, erro
 
 	hash.Write([]byte(signingString))
 
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil)), nil
+	hashBts := hash.Sum(nil)
+
+	b64enc := make([]byte, len(hashBts)*2)
+	_ = hex.Encode(b64enc, hashBts)
+
+	return base64.StdEncoding.EncodeToString(b64enc), nil
 }
 
 // Sign this signature using the given key
