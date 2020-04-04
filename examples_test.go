@@ -10,9 +10,9 @@ func Example_signing() {
 	r, _ := http.NewRequest("GET", "http://example.com/some-api", nil)
 
 	// Sign using the 'Signature' header
-	httpsignatures.DefaultSha256Signer.SignRequest("KeyId", "Key", r)
+	httpsignatures.DefaultSha256Signer.SignRequest("KeyId", "Key", r, true)
 	// OR Sign using the 'Authorization' header
-	httpsignatures.DefaultSha256Signer.AuthRequest("KeyId", "Key", r)
+	httpsignatures.DefaultSha256Signer.AuthRequest("KeyId", "Key", r, true)
 
 	http.DefaultClient.Do(r)
 }
@@ -25,7 +25,7 @@ func Example_customSigning() {
 
 	r, _ := http.NewRequest("GET", "http://example.com/some-api", nil)
 
-	signer.SignRequest("KeyId", "Key", r)
+	signer.SignRequest("KeyId", "Key", r, true)
 
 	http.DefaultClient.Do(r)
 }

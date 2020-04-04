@@ -37,7 +37,7 @@ func NewSigner(algorithm *Algorithm, headers ...string) *Signer {
 
 // SignRequest adds a http signature to the Signature: HTTP Header
 func (s Signer) SignRequest(id, key string, r *http.Request, toHex bool) error {
-	sig, err := s.buildSignature(id, key, r)
+	sig, err := s.buildSignature(id, key, r, toHex)
 	if err != nil {
 		return err
 	}
@@ -48,8 +48,8 @@ func (s Signer) SignRequest(id, key string, r *http.Request, toHex bool) error {
 }
 
 // AuthRequest adds a http signature to the Authorization: HTTP Header
-func (s Signer) AuthRequest(id, key string, r *http.Request) error {
-	sig, err := s.buildSignature(id, key, r)
+func (s Signer) AuthRequest(id, key string, r *http.Request, toHex bool) error {
+	sig, err := s.buildSignature(id, key, r, toHex)
 	if err != nil {
 		return err
 	}

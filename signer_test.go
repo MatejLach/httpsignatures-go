@@ -14,7 +14,7 @@ func TestSignSha1(t *testing.T) {
 		},
 	}
 
-	err := DefaultSha1Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := DefaultSha1Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	s, err := FromRequest(r)
@@ -37,7 +37,7 @@ func TestSignSha256(t *testing.T) {
 		},
 	}
 
-	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	s, err := FromRequest(r)
@@ -56,7 +56,7 @@ func TestSignSha256(t *testing.T) {
 func TestSignWithMissingDateHeader(t *testing.T) {
 	r := &http.Request{Header: http.Header{}}
 
-	err := DefaultSha1Signer.AuthRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := DefaultSha1Signer.AuthRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	assert.NotEqual(t, "", r.Header.Get("date"))
@@ -71,6 +71,6 @@ func TestSignWithMissingHeader(t *testing.T) {
 
 	s := NewSigner(AlgorithmHmacSha1, "foo")
 
-	err := s.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := s.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Equal(t, "Missing required header 'foo'", err.Error())
 }

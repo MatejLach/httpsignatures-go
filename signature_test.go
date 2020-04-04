@@ -93,7 +93,7 @@ func TestValidRequestIsValid(t *testing.T) {
 			"Date": []string{TEST_DATE},
 		},
 	}
-	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	sig, err := FromRequest(r)
@@ -108,7 +108,7 @@ func TestNotValidIfRequestHeadersChange(t *testing.T) {
 			"Date": []string{TEST_DATE},
 		},
 	}
-	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := DefaultSha256Signer.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	r.Header.Set("Date", "Thu, 05 Jan 2012 21:31:41 GMT")
@@ -127,7 +127,7 @@ func TestNotValidIfRequestIsMissingDate(t *testing.T) {
 
 	s := Signer{AlgorithmHmacSha1, HeaderList{RequestTarget}}
 
-	err := s.SignRequest(TEST_KEY_ID, TEST_KEY, r)
+	err := s.SignRequest(TEST_KEY_ID, TEST_KEY, r, true)
 	assert.Nil(t, err)
 
 	sig, err := FromRequest(r)
