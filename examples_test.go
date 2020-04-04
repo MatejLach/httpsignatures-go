@@ -43,7 +43,7 @@ func Example_verification() {
 		// that they are in sig.Headers
 
 		var key string // = lookup using sig.KeyID
-		if !sig.IsValid(key, r) {
+		if !sig.IsValid(key, r, true) {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

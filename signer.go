@@ -70,7 +70,7 @@ func (s Signer) buildSignature(id, key string, r *http.Request) (*Signature, err
 		Headers:   s.headers,
 	}
 
-	err := sig.sign(key, r)
+	err := sig.sign(key, r, true)
 	if err != nil {
 		return nil, err
 	}

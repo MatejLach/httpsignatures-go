@@ -108,7 +108,7 @@ func (s Signature) String() string {
 	return str
 }
 
-func (s Signature) calculateSignature(key string, r *http.Request) (string, error) {
+func (s Signature) calculateSignature(key string, r *http.Request, toHex bool) (string, error) {
 	hash := hmac.New(s.Algorithm.hash, []byte(key))
 
 	signingString, err := s.Headers.signingString(r)
@@ -120,15 +120,18 @@ func (s Signature) calculateSignature(key string, r *http.Request) (string, erro
 
 	hashBts := hash.Sum(nil)
 
-	b64enc := make([]byte, len(hashBts)*2)
-	_ = hex.Encode(b64enc, hashBts)
+	if toHex {
+		b64enc := make([]byte, len(hashBts)*2)
+		_ = hex.Encode(b64enc, hashBts)
+		return base64.StdEncoding.EncodeToString(b64enc), nil
+	}
 
-	return base64.StdEncoding.EncodeToString(b64enc), nil
+	return base64.StdEncoding.EncodeToString(hashBts), nil
 }
 
 // Sign this signature using the given key
-func (s *Signature) sign(key string, r *http.Request) error {
-	sig, err := s.calculateSignature(key, r)
+func (s *Signature) sign(key string, r *http.Request, toHex bool) error {
+	sig, err := s.calculateSignature(key, r, toHex)
 	if err != nil {
 		return err
 	}
@@ -138,12 +141,12 @@ func (s *Signature) sign(key string, r *http.Request) error {
 }
 
 // IsValid validates this signature for the given key
-func (s Signature) IsValid(key string, r *http.Request) bool {
+func (s Signature) IsValid(key string, r *http.Request, isHex bool) bool {
 	if !s.Headers.hasDate() {
 		return false
 	}
 
-	sig, err := s.calculateSignature(key, r)
+	sig, err := s.calculateSignature(key, r, isHex)
 	if err != nil {
 		return false
 	}
