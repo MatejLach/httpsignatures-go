@@ -3,12 +3,19 @@
 package httpsignatures
 
 import (
+	"crypto"
 	"crypto/hmac"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/subtle"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/pem"
 	"errors"
 	"fmt"
+	"hash"
 	"net/http"
 	"regexp"
 	"strings"
@@ -109,23 +116,49 @@ func (s Signature) String() string {
 }
 
 func (s Signature) calculateSignature(key string, r *http.Request, toHex bool) (string, error) {
-	hash := hmac.New(s.Algorithm.hash, []byte(key))
+	var hsh hash.Hash
+	if strings.HasPrefix(s.Algorithm.name, "rsa") {
+		hsh = sha256.New()
+	} else {
+		hsh = hmac.New(s.Algorithm.hash, []byte(key))
+	}
 
 	signingString, err := s.Headers.signingString(r)
 	if err != nil {
 		return "", err
 	}
 
-	hash.Write([]byte(signingString))
+	hsh.Write([]byte(signingString))
 
-	hashBts := hash.Sum(nil)
+	hashBts := hsh.Sum(nil)
+
+	if strings.HasPrefix(s.Algorithm.name, "rsa") {
+		pkPem, _ := pem.Decode([]byte(key))
+		if pkPem == nil {
+			return "", fmt.Errorf("invalid RSA private key PEM provided")
+		}
+		privKey, err := x509.ParsePKCS1PrivateKey(pkPem.Bytes)
+		if err != nil {
+			return "", err
+		}
+		signed, err := rsa.SignPKCS1v15(rand.Reader, privKey, crypto.SHA256, hashBts)
+		if err != nil {
+			return "", err
+		}
+
+		if toHex {
+			b64enc := make([]byte, len(signed)*2)
+			_ = hex.Encode(b64enc, signed)
+			return base64.StdEncoding.EncodeToString(b64enc), nil
+		}
+		return base64.StdEncoding.EncodeToString(signed), nil
+	}
 
 	if toHex {
 		b64enc := make([]byte, len(hashBts)*2)
 		_ = hex.Encode(b64enc, hashBts)
 		return base64.StdEncoding.EncodeToString(b64enc), nil
 	}
-
 	return base64.StdEncoding.EncodeToString(hashBts), nil
 }
 
